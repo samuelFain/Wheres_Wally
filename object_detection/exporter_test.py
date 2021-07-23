@@ -28,8 +28,8 @@ class FakeModel(model.DetectionModel):
 
   def preprocess(self, inputs):
     return (tf.identity(inputs) *
-            tf.get_variable('dummy', shape=(),
-                            initializer=tf.constant_initializer(2),
+            tf.compat.v1.get_variable('dummy', shape=(),
+                            initializer=tf.compat.v1.constant_initializer(2),
                             dtype=tf.float32))
 
   def predict(self, preprocessed_inputs):
@@ -62,8 +62,8 @@ class ExportInferenceGraphTest(tf.test.TestCase):
       mock_model.preprocess(tf.constant([1, 3, 4, 3], tf.float32))
       if use_moving_averages:
         tf.train.ExponentialMovingAverage(0.0).apply()
-      saver = tf.train.Saver()
-      init = tf.global_variables_initializer()
+      saver = tf.compat.v1.train.Saver()
+      init = tf.compat.v1.global_variables_initializer()
       with self.test_session() as sess:
         sess.run(init)
         saver.save(sess, checkpoint_path)
@@ -71,8 +71,8 @@ class ExportInferenceGraphTest(tf.test.TestCase):
   def _load_inference_graph(self, inference_graph_path):
     od_graph = tf.Graph()
     with od_graph.as_default():
-      od_graph_def = tf.GraphDef()
-      with tf.gfile.GFile(inference_graph_path) as fid:
+      od_graph_def = tf.compat.v1.GraphDef()
+      with tf.io.gfile.GFile(inference_graph_path) as fid:
         serialized_graph = fid.read()
         od_graph_def.ParseFromString(serialized_graph)
         tf.import_graph_def(od_graph_def, name='')

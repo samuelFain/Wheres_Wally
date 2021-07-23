@@ -99,7 +99,7 @@ def freeze_graph_with_def_protos(
 
 # TODO: Support batch tf example inputs.
 def _tf_example_input_placeholder():
-  tf_example_placeholder = tf.placeholder(
+  tf_example_placeholder = tf.compat.v1.placeholder(
       tf.string, shape=[], name='tf_example')
   tensor_dict = tf_example_decoder.TfExampleDecoder().Decode(
       tf_example_placeholder)
@@ -108,7 +108,7 @@ def _tf_example_input_placeholder():
 
 
 def _image_tensor_input_placeholder():
-  return tf.placeholder(dtype=tf.uint8,
+  return tf.compat.v1.placeholder(dtype=tf.uint8,
                         shape=(1, None, None, 3),
                         name='image_tensor')
 
@@ -170,15 +170,15 @@ def _write_inference_graph(inference_graph_path,
     output_node_names: Output tensor names, defaults are: num_detections,
       detection_scores, detection_boxes, detection_classes.
   """
-  inference_graph_def = tf.get_default_graph().as_graph_def()
+  inference_graph_def = tf.compat.v1.get_default_graph().as_graph_def()
   if checkpoint_path:
     saver = None
     if use_moving_averages:
       variable_averages = tf.train.ExponentialMovingAverage(0.0)
       variables_to_restore = variable_averages.variables_to_restore()
-      saver = tf.train.Saver(variables_to_restore)
+      saver = tf.compat.v1.train.Saver(variables_to_restore)
     else:
-      saver = tf.train.Saver()
+      saver = tf.compat.v1.train.Saver()
     freeze_graph_with_def_protos(
         input_graph_def=inference_graph_def,
         input_saver_def=saver.as_saver_def(),
@@ -190,7 +190,7 @@ def _write_inference_graph(inference_graph_path,
         clear_devices=True,
         initializer_nodes='')
     return
-  tf.train.write_graph(inference_graph_def,
+  tf.io.write_graph(inference_graph_def,
                        os.path.dirname(inference_graph_path),
                        os.path.basename(inference_graph_path),
                        as_text=False)
@@ -203,7 +203,7 @@ def _export_inference_graph(input_type,
                             inference_graph_path):
   if input_type not in input_placeholder_fn_map:
     raise ValueError('Unknown input type: {}'.format(input_type))
-  inputs = tf.to_float(input_placeholder_fn_map[input_type]())
+  inputs = tf.cast(input_placeholder_fn_map[input_type](), dtype=tf.float32)
   preprocessed_inputs = detection_model.preprocess(inputs)
   output_tensors = detection_model.predict(preprocessed_inputs)
   postprocessed_tensors = detection_model.postprocess(output_tensors)

@@ -37,7 +37,7 @@ from object_detection.utils import dataset_util
 from object_detection.utils import label_map_util
 
 
-flags = tf.app.flags
+flags = tf.compat.v1.app.flags
 flags.DEFINE_string('data_dir', '', 'Root directory to raw PASCAL VOC dataset.')
 flags.DEFINE_string('set', 'train', 'Convert training set, validation set or '
                     'merged set.')
@@ -83,7 +83,7 @@ def dict_to_tf_example(data,
   """
   img_path = os.path.join(data['folder'], image_subdirectory, data['filename'])
   full_path = os.path.join(dataset_directory, img_path)
-  with tf.gfile.GFile(full_path) as fid:
+  with tf.io.gfile.GFile(full_path) as fid:
     encoded_jpg = fid.read()
   encoded_jpg_io = io.BytesIO(encoded_jpg)
   image = PIL.Image.open(encoded_jpg_io)
@@ -151,7 +151,7 @@ def main(_):
   if FLAGS.year != 'merged':
     years = [FLAGS.year]
 
-  writer = tf.python_io.TFRecordWriter(FLAGS.output_path)
+  writer = tf.io.TFRecordWriter(FLAGS.output_path)
 
   label_map_dict = label_map_util.get_label_map_dict(FLAGS.label_map_path)
 
@@ -165,7 +165,7 @@ def main(_):
       if idx % 100 == 0:
         logging.info('On image %d of %d', idx, len(examples_list))
       path = os.path.join(annotations_dir, example + '.xml')
-      with tf.gfile.GFile(path, 'r') as fid:
+      with tf.io.gfile.GFile(path, 'r') as fid:
         xml_str = fid.read()
       xml = etree.fromstring(xml_str)
       data = dataset_util.recursive_parse_xml_to_dict(xml)['annotation']
@@ -178,4 +178,4 @@ def main(_):
 
 
 if __name__ == '__main__':
-  tf.app.run()
+  tf.compat.v1.app.run()

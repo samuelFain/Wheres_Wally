@@ -49,7 +49,7 @@ class MockBoxPredictor(box_predictor.BoxPredictor):
     num_anchors = (image_features.get_shape().as_list()[1]
                    * image_features.get_shape().as_list()[2])
     code_size = 4
-    zero = tf.reduce_sum(0 * image_features)
+    zero = tf.reduce_sum(input_tensor=0 * image_features)
     box_encodings = zero + tf.zeros(
         (batch_size, num_anchors, 1, code_size), dtype=tf.float32)
     class_predictions_with_background = zero + tf.zeros(
