@@ -102,9 +102,9 @@ def multiclass_non_max_suppression(boxes,
     raise ValueError('if change_coordinate_frame is True, then a clip_window'
                      'must be specified.')
 
-  with tf.name_scope(scope, 'MultiClassNonMaxSuppression'):
-    num_boxes = tf.shape(boxes)[0]
-    num_scores = tf.shape(scores)[0]
+  with tf.compat.v1.name_scope(scope, 'MultiClassNonMaxSuppression'):
+    num_boxes = tf.shape(input=boxes)[0]
+    num_scores = tf.shape(input=scores)[0]
     num_classes = scores.get_shape()[1]
 
     length_assert = tf.Assert(
@@ -235,7 +235,7 @@ def batch_multiclass_non_max_suppression(boxes,
     raise ValueError('third dimension of boxes must be either 1 or equal '
                      'to the third dimension of scores')
 
-  with tf.name_scope(scope, 'BatchMultiClassNonMaxSuppression'):
+  with tf.compat.v1.name_scope(scope, 'BatchMultiClassNonMaxSuppression'):
     per_image_boxes_list = tf.unstack(boxes)
     per_image_scores_list = tf.unstack(scores)
     num_valid_boxes_list = len(per_image_boxes_list) * [None]
@@ -275,7 +275,7 @@ def batch_multiclass_non_max_suppression(boxes,
           masks=per_image_masks,
           clip_window=clip_window,
           change_coordinate_frame=change_coordinate_frame)
-      num_detections_list.append(tf.to_float(nmsed_boxlist.num_boxes()))
+      num_detections_list.append(tf.cast(nmsed_boxlist.num_boxes(), dtype=tf.float32))
       padded_boxlist = box_list_ops.pad_or_clip_box_list(nmsed_boxlist,
                                                          max_total_size)
       detection_boxes_list.append(padded_boxlist.get())

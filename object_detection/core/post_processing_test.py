@@ -142,7 +142,7 @@ class MulticlassNonMaxSuppressionTest(tf.test.TestCase):
                           [.5, 0.01], [.3, 0.01],
                           [.01, .85], [.01, .5]])
 
-    num_boxes = tf.shape(boxes)[0]
+    num_boxes = tf.shape(input=boxes)[0]
     heatmap_height = 5
     heatmap_width = 5
     num_keypoints = 17

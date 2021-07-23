@@ -46,12 +46,12 @@ class FakeFasterRCNNFeatureExtractor(
     return tf.identity(resized_inputs)
 
   def _extract_proposal_features(self, preprocessed_inputs, scope):
-    with tf.variable_scope('mock_model'):
+    with tf.compat.v1.variable_scope('mock_model'):
       return 0 * slim.conv2d(preprocessed_inputs,
                              num_outputs=3, kernel_size=1, scope='layer1')
 
   def _extract_box_classifier_features(self, proposal_feature_maps, scope):
-    with tf.variable_scope('mock_model'):
+    with tf.compat.v1.variable_scope('mock_model'):
       return 0 * slim.conv2d(proposal_feature_maps,
                              num_outputs=3, kernel_size=1, scope='layer2')
 
@@ -237,7 +237,7 @@ class FasterRCNNMetaArchTestBase(tf.test.TestCase):
       width = 12
       input_image_shape = (batch_size, height, width, 3)
 
-      preprocessed_inputs = tf.placeholder(dtype=tf.float32,
+      preprocessed_inputs = tf.compat.v1.placeholder(dtype=tf.float32,
                                            shape=(batch_size, None, None, 3))
       prediction_dict = model.predict(preprocessed_inputs)
 
@@ -259,7 +259,7 @@ class FasterRCNNMetaArchTestBase(tf.test.TestCase):
           'anchors': (expected_num_anchors, 4)
       }
 
-      init_op = tf.global_variables_initializer()
+      init_op = tf.compat.v1.global_variables_initializer()
       with self.test_session() as sess:
         sess.run(init_op)
         prediction_out = sess.run(prediction_dict,
@@ -291,7 +291,7 @@ class FasterRCNNMetaArchTestBase(tf.test.TestCase):
       height = 10
       width = 12
       input_image_shape = (batch_size, height, width, 3)
-      preprocessed_inputs = tf.placeholder(dtype=tf.float32,
+      preprocessed_inputs = tf.compat.v1.placeholder(dtype=tf.float32,
                                            shape=(batch_size, None, None, 3))
       prediction_dict = model.predict(preprocessed_inputs)
 
@@ -304,7 +304,7 @@ class FasterRCNNMetaArchTestBase(tf.test.TestCase):
       # a strict upper bound on the number of anchors.
       num_anchors_strict_upper_bound = height * width * 3 * 3
 
-      init_op = tf.global_variables_initializer()
+      init_op = tf.compat.v1.global_variables_initializer()
       with self.test_session() as sess:
         sess.run(init_op)
         prediction_out = sess.run(prediction_dict,
@@ -361,7 +361,7 @@ class FasterRCNNMetaArchTestBase(tf.test.TestCase):
           'num_proposals': (2,),
           'proposal_boxes': (2, 8, 4),
       }
-      init_op = tf.global_variables_initializer()
+      init_op = tf.compat.v1.global_variables_initializer()
       with self.test_session() as sess:
         sess.run(init_op)
         tensor_dict_out = sess.run(result_tensor_dict)
@@ -400,7 +400,7 @@ class FasterRCNNMetaArchTestBase(tf.test.TestCase):
           'num_proposals': (2,),
           'proposal_boxes': (2, 7, 4),
       }
-      init_op = tf.global_variables_initializer()
+      init_op = tf.compat.v1.global_variables_initializer()
       with self.test_session() as sess:
         sess.run(init_op)
         tensor_dict_out = sess.run(result_tensor_dict)
@@ -961,13 +961,13 @@ class FasterRCNNMetaArchTestBase(tf.test.TestCase):
     # Define mock tensorflow classification graph and save variables.
     test_graph_classification = tf.Graph()
     with test_graph_classification.as_default():
-      image = tf.placeholder(dtype=tf.float32, shape=[1, 20, 20, 3])
-      with tf.variable_scope('mock_model'):
+      image = tf.compat.v1.placeholder(dtype=tf.float32, shape=[1, 20, 20, 3])
+      with tf.compat.v1.variable_scope('mock_model'):
         net = slim.conv2d(image, num_outputs=3, kernel_size=1, scope='layer1')
         slim.conv2d(net, num_outputs=3, kernel_size=1, scope='layer2')
 
-      init_op = tf.global_variables_initializer()
-      saver = tf.train.Saver()
+      init_op = tf.compat.v1.global_variables_initializer()
+      saver = tf.compat.v1.train.Saver()
       save_path = self.get_temp_dir()
       with self.test_session() as sess:
         sess.run(init_op)
@@ -981,8 +981,8 @@ class FasterRCNNMetaArchTestBase(tf.test.TestCase):
           is_training=False, first_stage_only=False, second_stage_batch_size=6)
 
       inputs_shape = (2, 20, 20, 3)
-      inputs = tf.to_float(tf.random_uniform(
-          inputs_shape, minval=0, maxval=255, dtype=tf.int32))
+      inputs = tf.cast(tf.random.uniform(
+          inputs_shape, minval=0, maxval=255, dtype=tf.int32), dtype=tf.float32)
       preprocessed_inputs = model.preprocess(inputs)
       prediction_dict = model.predict(preprocessed_inputs)
       model.postprocess(prediction_dict)
@@ -998,13 +998,13 @@ class FasterRCNNMetaArchTestBase(tf.test.TestCase):
       model = self._build_model(
           is_training=False, first_stage_only=False, second_stage_batch_size=6)
       inputs_shape = (2, 20, 20, 3)
-      inputs = tf.to_float(tf.random_uniform(
-          inputs_shape, minval=0, maxval=255, dtype=tf.int32))
+      inputs = tf.cast(tf.random.uniform(
+          inputs_shape, minval=0, maxval=255, dtype=tf.int32), dtype=tf.float32)
       preprocessed_inputs = model.preprocess(inputs)
       prediction_dict = model.predict(preprocessed_inputs)
       model.postprocess(prediction_dict)
-      init_op = tf.global_variables_initializer()
-      saver = tf.train.Saver()
+      init_op = tf.compat.v1.global_variables_initializer()
+      saver = tf.compat.v1.train.Saver()
       save_path = self.get_temp_dir()
       with self.test_session() as sess:
         sess.run(init_op)
@@ -1017,8 +1017,8 @@ class FasterRCNNMetaArchTestBase(tf.test.TestCase):
                                  second_stage_batch_size=6, num_classes=42)
 
       inputs_shape2 = (2, 20, 20, 3)
-      inputs2 = tf.to_float(tf.random_uniform(
-          inputs_shape2, minval=0, maxval=255, dtype=tf.int32))
+      inputs2 = tf.cast(tf.random.uniform(
+          inputs_shape2, minval=0, maxval=255, dtype=tf.int32), dtype=tf.float32)
       preprocessed_inputs2 = model2.preprocess(inputs2)
       prediction_dict2 = model2.predict(preprocessed_inputs2)
       model2.postprocess(prediction_dict2)
@@ -1026,7 +1026,7 @@ class FasterRCNNMetaArchTestBase(tf.test.TestCase):
                                      from_detection_checkpoint=True)
       with self.test_session() as sess:
         restore_fn(sess)
-        for var in sess.run(tf.report_uninitialized_variables()):
+        for var in sess.run(tf.compat.v1.report_uninitialized_variables()):
           self.assertNotIn(model2.first_stage_feature_extractor_scope, var.name)
           self.assertNotIn(model2.second_stage_feature_extractor_scope,
                            var.name)
