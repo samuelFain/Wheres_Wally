@@ -94,6 +94,8 @@ with detection_graph.as_default():
         canvas = FigureCanvasTkAgg(figure,master=window)
         canvas.draw()
         canvas.get_tk_widget().pack()
+        plt.margins(0,0)
+        plt.gca().set_axis_off()
         myFont = font.Font(family="Helvatica")
         button = tk.Button(text='Close Window',bg="#FA8072",width="10",height="1",command = close_window)
         button['font']=myFont
