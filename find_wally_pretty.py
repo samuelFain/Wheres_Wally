@@ -1,9 +1,13 @@
+import os
+
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+os.environ["AUTOGRAPH_VERBOSITY"] = "0"
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 from matplotlib import pyplot as plt
 import tkinter as tk
 from tkinter import font, messagebox
-from playsound import playsound
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-
+from pygame import mixer
 import numpy as np
 import sys
 import tensorflow as tf
@@ -13,8 +17,10 @@ import matplotlib.patches as patches
 import argparse
 
 matplotlib.use("TkAgg")
+tf.get_logger().setLevel("WARNING")
 
 model_path = './trained_model/frozen_inference_graph.pb'
+mixer.init()
 
 
 def draw_box(box, image_np):
@@ -74,7 +80,7 @@ with detection_graph.as_default():
             root = tk.Tk()
             root.withdraw()
             messagebox.showerror("Not found", "Wally not found :(")
-            sys.exit('Wally not found :(')
+            sys.exit()
 
 
         def close_window():
@@ -82,7 +88,8 @@ with detection_graph.as_default():
 
 
         print('Wally found')
-        playsound('sounds/found_wally_yay.mp3', False)
+        mixer.music.load('sounds/found_wally_yay.mp3')
+        mixer.music.play()
         window = tk.Tk()
         window.title("Result")
         window.geometry("1000x1100")
