@@ -1,6 +1,8 @@
 # Where's Wally 
 ## _solving Where's Wally puzzles with Tensorflow Object Detection_
 
+![wally-gif](https://github.com/samuelFain/Wheres_Wally/blob/master/wally-cut.gif)
+
 This is a Tensorflow project that includes a model for solving Where's Wally puzzles. It uses Faster RCNN Inception v2 model initially trained on COCO dataset and retrained for finding Wally using transfer learning with Tensorflow Object Detection API.
 
 ## Project Description
